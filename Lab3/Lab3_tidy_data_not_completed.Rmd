@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/Downloads/UMich_Bio201_F19/Lab3/")
+knitr::opts_knit$set(root.dir = "~/Documents/UMich_Bio201_F19/Lab3/")
 ```
 
 # Load packages
@@ -272,15 +272,21 @@ Do the following as one long series of commands using pipes:
 * Drop intermediate columns used for calculations 
 
 ```{r}
+    
+  scfa_indv <- rename_all(scfa_indv, tolower) %>%
+  mutate(scfa_indv, sample_kg = sample_wt_g )
+  
 
-scfa_indv_qc <- scfa_indv %>%
+```
+
+
+```{r}
+
   scfa_indv <- rename_all(scfa_indv, tolower) %>% 
   mutate(scfa_indv, sample_kg = sample_wt_g / 1000) %>% 
   mutate(scfa_indv, ht_cm = ht_in * 2.54) %>% 
-  mutate(scfa_indv, wt_kgs = wt_lbs / 2.205) %>% 
-  
-  
-  s
+  mutate(scfa_indv, wt_kgs = wt_lbs / 2.205) 
+
   
 ```
 
