@@ -1,13 +1,13 @@
 ---
 title: 'Bio 201: Lab 3 graphics'
-author: "Kristi Gdanetz MacCready"
-date: "9/23/2019"
+author: "Maira Gajda"
+date: "9/30/2019"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/Documents/UMich_Bio201_F19/Lab3/")
+knitr::opts_knit$set(root.dir = "~/Downloads/UMich_Bio201_F19/Lab3/")
 ```
 
 We always begin by loading the required packages. ggplot2 is included in the tidyverse package, and if not completed earlier, load cowplot. We will use cowplot in addition to ggplot when generating graphics because it simplifies the ggplot default themes to conform to figure standards set by most biological publications. ggplot2 is a plotting package that makes it simple to create complex plots from data in a data frame. It provides a more programmatic interface for specifying what variables to plot, how they are displayed, and general visual properties. Therefore, you only need minimal changes if the underlying data change or if you decide to change from a bar plot to a scatter plot. This helps in creating publication quality plots with minimal amounts of adjustments and tweaking.
@@ -30,7 +30,7 @@ ggplot2 functions like data in the ‘long’ format, i.e., a column for every d
 ### Homework 3.4
 ```{r}
 # import curated data set, save as new data frame 
-scfa_qc <- read_delim(file = "curated_data/SCFA_wkly.txt", 
+scfa_qc <- read_delim(file = "curated_data/scfa_wkly_qc.txt", 
                         delim = "\t", escape_double = FALSE, trim_ws = TRUE, na=c("NA"),
                         col_types = list())
 

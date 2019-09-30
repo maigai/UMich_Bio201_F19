@@ -49,6 +49,7 @@ scfa_wkly <- read_delim(file = "raw_data/SCFA_wkly.txt",
 The abbreviated output below gives the first several columns and the first ten rows of the data frame. You’ll notice that at the bottom of the output, it tells us additional rows and columns. In addition, the output tells us the variable type of each column.
 
 ```{r}
+
 # remove import data frame from global environment 
 rm(scfa_wkly)
 ```
@@ -209,7 +210,7 @@ What if you want to select and filter at the same time? There are three ways to 
 With intermediate steps, you create a temporary data frame and use that as input to the next function.
 ```{r}
 scfa_indv2 <- filter(scfa_indv, sample_wt_g > 0.10)
-but_data <- select(scfa_indv2, 
+ but_data <- select(scfa_indv2, 
                    participant_id, study_week, supplement_consumed, butyrate_mM, notes)
 ```
 This is readable, but can clutter up your workspace with lots of objects that you have to name and keep track of individually. 
@@ -278,23 +279,22 @@ Do the following as one long series of commands using pipes:
 ```{r}
 
   scfa_indv_qc <- scfa_indv %>%
-  scfa_indv <- rename_all(scfa_indv, tolower) %>%
-  mutate(scfa_indv, 
-         ht_cm = round(ht_in * 2.54),
+  rename_all(tolower) %>%
+  mutate(ht_cm = round(ht_in * 2.54),
          wt_kgs = round(wt_lbs / 2.205)
          ) %>%  
   filter(sample_wt_g > 0.10) %>% 
   filter(notes != "frozen >24hrs") %>% 
-  mutate(scfa_indv, sample_kg = sample_wt_g * 1000, 
-         mM_per_kg_acetate =  acetate_mM / sample_kg,
-         mM_per_kg_butyrate = butyrate_mM / sample_kg,
-         mM_per_kg_propionate = propionate_mM / sample_kg, 
-         total_scfa_mM = acetate_mM + butyrate_mM + propionate_mM, 
-         acetate_mM = round(acetate_mM, digits = 2),
-         butyrate_mM = round(butyrate_mM, digits = 2), 
-         propionate_mM = round(propionate_mM, digits = 2)
+  mutate(sample_kg = sample_wt_g * 1000, 
+         mm_per_kg_acetate =  acetate_mm / sample_kg,
+         mm_per_kg_butyrate = butyrate_mm / sample_kg,
+         mm_per_kg_propionate = propionate_mm / sample_kg, 
+         total_scfa_mm = acetate_mm + butyrate_mm + propionate_mm, 
+         acetate_mm = round(acetate_mm, digits = 2),
+         butyrate_mm = round(butyrate_mm, digits = 2), 
+         propionate_mm = round(propionate_mm, digits = 2)
          ) %>% 
-  select(scfa_indv, -ht_in, -wt_lbs, -sample_wt_g, -sample_kg)
+  select(-ht_in, -wt_lbs, -sample_wt_g, -sample_kg)
   
   
 
@@ -327,15 +327,23 @@ Import the scfa_wkly dataset. Complete the following QC measures as one long ser
 * Filter for individuals who were quantity compliant #none 
 * Calculate the mean and median total SCFAs
 
+
+we removed it earlier so now re-import
+```{r}
+scfa_wkly <- read_delim(file = "raw_data/SCFA_wkly.txt", 
+                        delim = "\t", escape_double = FALSE, trim_ws = TRUE, na=c("NA"),
+                        col_types = list())
+``` 
+
 ```{r}
 summarise(scfa_wkly)
 ```
 
 ```{r}
 scfa_wkly_qc <- scfa_wkly %>%
-  rename_all(scfa_wkly, tolower) %>% 
-  filter(study_week = week1 || study_week = week3 ) %>% 
-  filter(quantity_compliant = none) %>% 
+  rename_all(tolower) %>% 
+  filter(study_week == "week1" || study_week == "week3" ) %>% 
+  filter(quantity_compliant == "none") %>% 
   mutate(median_scfa = acetate_median + butyrate_median + propionate_median, 
          mean_scfa = acetate_mean + butyrate_mean + propionate_mean
            ) 
