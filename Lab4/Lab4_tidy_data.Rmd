@@ -5,9 +5,11 @@ date: "9/30/2019"
 output: html_document
 ---
 
+••••Make sure the file path is the same, and that it pulls data from lab3 and exports to lab4••••
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/Documents/UMich_Bio201_F19/")
+knitr::opts_knit$set(root.dir = "~/Downloads/UMich_Bio201_F19/")
 ```
 
 # Load packages
@@ -25,6 +27,7 @@ scfa_data <- read_delim(file = "Lab3/curated_data/scfa_indv_qc.txt",
                         delim = "\t", col_names = TRUE, trim_ws = TRUE, 
                         na = c("", "NA")) %>%
   rename_all(tolower)
+
 ```
 
 
@@ -47,7 +50,7 @@ group_by() is often used together with summarize(), which collapses each group i
 ```{r}
 scfa_data %>%
   group_by(semester) %>%
-  summarize(mean_butyrate = mean(butyrate_mmol_kg, na.rm = TRUE))
+  summarize(mean_butyrate = mean(mm_per_kg_butyrate, na.rm = TRUE)) 
 ```
 
 Not all participants consumed the same supplement for a given semester, and some participants did not consume a supplement at all. It is not a meaningful summary statistic to keep these participants together when calculating a mean. To do this calculation group by multiple columns. This is achieved by naming all the columns:
@@ -55,7 +58,7 @@ Not all participants consumed the same supplement for a given semester, and some
 ```{r}
 scfa_data %>%
   group_by(semester, supplement_consumed) %>%
-  summarize(mean_butyrate = mean(butyrate_mmol_kg))
+  summarize(mean_butyrate = mean(mm_per_kg_butyrate))
 ```
 
 You may notice that the mean column just calculated contains NAs. When grouping both by semester and supplement_consumed, there are individuals for which a butyrate measurement could not be determined (this could be due to a concentration below the limit of detection on the HPLC, or there was an issue with the integrity of the sample, or there was an issue with the sample collection protocol). When a group contains an NA the mean function is not able to do the calculation. 
@@ -64,40 +67,40 @@ To avoid this, we can remove the missing values for butyrate before we attempt t
 
 ```{r}
 scfa_data %>%
-  #filter(!is.na(butyrate_mmol_kg)) %>%
+  #filter(!is.na(mm_per_kg_butyrate)) %>% 
   group_by(semester, supplement_consumed) %>%
-  summarize(mean_butyrate = mean(butyrate_mmol_kg, na.rm = TRUE))
+  summarize(mean_butyrate = mean(mm_per_kg_butyrate, na.rm = TRUE))
 ```
 
 In the examples above, the resulting output is long enough that you can click through the rows. Once you are more comfortable with summary functions, you may want to print fewer data. Use the function head() for a default of 6 rows to display:
 
 ```{r}
 scfa_data %>%
-  filter(!is.na(butyrate_mmol_kg)) %>%
+  filter(!is.na(mm_per_kg_butyrate)) %>%
   group_by(semester, supplement_consumed) %>%
-  summarize(mean_butyrate = mean(butyrate_mmol_kg)) %>%
-  head()
+  summarize(mean_butyrate = mean(mm_per_kg_butyrate)) %>%
 ```
 
 Once these data are grouped, it is possible to summarize multiple variables at the same time, and not necessarily on the same variable (similar to completing multiple calculations within one call of the mutate function). For instance, add a column calculating the standard deviation for each group, and another column to count the number of observations:
 
 ```{r}
 scfa_data %>%
- filter(!is.na(butyrate_mmol_kg)) %>%
+ filter(!is.na(mm_per_kg_butyrate)) %>%
   group_by(semester, supplement_consumed) %>%
-  summarize(mean_butyrate = mean(butyrate_mmol_kg), 
-            sd_butyrate = sd(butyrate_mmol_kg), 
+  summarize(mean_butyrate = mean(mm_per_kg_butyrate), 
+            sd_butyrate = sd(mm_per_kg_butyrate), 
             n_butyrate = n())
 ```
+
 
 It is sometimes useful to rearrange the result of a query to inspect the values. For instance, sort on mean_butyrate to put the highest concentrations first:
 
 ```{r}
 scfa_data %>%
-  filter(!is.na(butyrate_mmol_kg)) %>%
+  filter(!is.na(mm_per_kg_butyrate)) %>%
   group_by(semester, supplement_consumed) %>%
-  summarize(mean_butyrate = mean(butyrate_mmol_kg), 
-            sd_butyrate = sd(butyrate_mmol_kg), 
+  summarize(mean_butyrate = mean(mm_per_kg_butyrate), 
+            sd_butyrate = sd(mm_per_kg_butyrate), 
             n_butyrate = n()) %>%
   arrange(-mean_butyrate) #drop "-" to put lowest first 
 ```
@@ -107,7 +110,16 @@ When you use arrange to sort a data frame, it changes the order of the data stor
 Apply the group and summarise functions to determine the mean concentration of all three SCFAs for each participant, during each week of the study. Can you do this without creating any intermediate data frames? 
 
 ```{r}
-# write code here
+colnames(scfa_data) 
+
+```
+
+```{r}
+
+
+scfa_data %>%  
+  group_by() %>% 
+  summarize()
 
 ```
 
