@@ -1,6 +1,7 @@
 ---
 title: "Lab 5 new"
-author: "Kristi Gdanetz MacCready"
+author: "Maira Gajda"
+note: "Using curated data, am in tizzy"
 date: "10/07/2019"
 output: html_document
 ---
@@ -50,6 +51,10 @@ ggplot(data = df1, aes(x = samples, #plot data frame
   geom_jitter(aes(color = samples)) + #jitter = individual points per category 
   theme(legend.position = "none")
 ```
+# ••••• Are these two vectors equal? •••••
+
+I would not determine the vectors to be equal. There is no overlap between the any of the quartiles of either box, or the largest and smallest outliers. 
+
 
 ### Example 2
 ```{r}
@@ -67,6 +72,10 @@ ggplot(data = df2, aes(x = samples, #plot data frame
   geom_jitter(aes(color = samples)) + 
   theme(legend.position = "none")
 ```
+# ••••• Are these two vectors equal? •••••
+
+These two vectors are roughly equal. There is significant visual overlap between the interquartile ranges of each vector, but they're skewed in opposite directions. 
+
 
 ### Example 3
 ```{r}
@@ -84,6 +93,9 @@ ggplot(data = df3, aes(x = samples, #plot data frame
   geom_jitter(aes(color = samples)) + 
   theme(legend.position = "none")
 ```
+# ••••• Are these two vectors equal? •••••
+No there is no significant pverlap between the interquatile range of either vector, or any overla between the first and third quartiles. 
+
 
 ### Example 4
 ```{r}
@@ -101,6 +113,8 @@ ggplot(data = df4, aes(x = samples, #plot data frame
   geom_jitter(aes(color = samples)) + 
   theme(legend.position = "none")
 ```
+# ••••• Are these two vectors equal? •••••
+There is some overlap between the means and the interquartile range of each vectors, but they still are shaped differently.
 
 # Import data 
 
@@ -172,6 +186,8 @@ butyrate_long %>%
 ```
 
 In the plots created above, notice the widest part of the twice daily category appears slightly higher than once daily. This means most of the data points in the 2x group are of a higher concentration that those in the 1x group. However the top of the violin in the 1x group is higher than the 2x, indicating the 1x group's maximum value is greater. Discuss with your neighbor, do you think the butyrate concentrations of these two groups (1x vs. 2x) are different? 
+
+They're different concentrations. The 2x daily groups has a more consistent concentration of butyrate, throughout a smaller range. The 1x daily group has a large spike in the data and more variance throughout the range of data. 
 
 ### Checking assumptions
 In the sections above we observed trends in the data, but this is not sufficient for research purposes. Scientists use statistics to determine the probability that these trends are real. Before we can dive into using a statistical test, we have to determine if our data are appropriate for the test of interest, otherwise we might have more confidence in the results than we should. We do this by checking the assumptions of the tests. 
@@ -256,7 +272,7 @@ butyrate_long %>%
          frequency) + 
   geom_violin() + # geom_jitter() + 
   facet_grid(~frequency) + 
-  xlab(NULL) + 
+  xlab(NULL) +
   ylab("Butyrate (mmol/kg)") + 
   theme(legend.position = "none")
 ```
@@ -317,16 +333,51 @@ wilcox.test(x = x2_df$butyrate_mean_wk1,
 Repeat the process to conduct the paired t-test for the 1xdaily group. Remember to check the assumptions. Write your conclusions regarding the test as a comment at the end of the code block. 
 ```{r}
 # copy + paste code, and update column and dataframes names to run test
+# one times daily test group butyrate_long <- scfa_long %>%
+
+# Check assumptions for each week of the 1xdaily groups 
+wk1_1x <- butyrate_long %>%
+  filter(study_week == "week1", 
+         supplement_consumed == "BRMPS", 
+         frequency == "1xdaily") 
+shapiro.test(wk1_1x$butyrate_mean) 
+ggplot(wk1_1x, aes(x = butyrate_mean)) + geom_histogram()
+
+wk3_1x <- butyrate_long %>%
+  filter(study_week == "week3", 
+         supplement_consumed == "BRMPS", 
+         frequency == "1xdaily") 
+shapiro.test(wk3_1x$butyrate_mean) 
+ggplot(wk3_1x, aes(x = butyrate_mean)) + geom_histogram()
+
+# join these data frames back together
+x1_df <- inner_join(x = wk1_1x, y = wk3_1x,
+                    by = c("participant_id", "frequency", 
+                           "semester", "supplement_consumed", "quantity_compliant")) %>%
+  rename(butyrate_mean_wk1 = butyrate_mean.x,
+         butyrate_mean_wk3 = butyrate_mean.y) %>%
+  select(-starts_with("study_week"))
+
+# code to run paired t-test 
+t.test(x = x1_df$butyrate_mean_wk1, y = x1_df$butyrate_mean_wk3, 
+       alternative = "less", paired = TRUE) 
+
+# with a p value of .2367, I can say with 95% confidence that there is no meaningful difference between the group at week 1 and the group at week 3. 
+
+```
+
+
+
 ```
 
 # Homework 5.2
 Generate plots to determine if methane, acetate, propionate increased during week 3 of the study. Generate plot to determine if pH decreased during week 3 of the study. Save plots to folder called `figures`. 
 ```{r}
-# breath methane
-```
+omit the median selet for the methane 
 
-```{r}
-# acetate
+
+
+# first import the data frame, select forthe relevant  things, exclude the median. vajza a huaje ishte shum e emble, mos ki fr xhan
 ```
 
 ```{r}
@@ -379,6 +430,8 @@ As you know, we have more than two starch groups we would like to analyze. Inste
 
 To illustrate when an ANOVA would be useful, use the `scfa_wide` data frame imported above, plot the delta butyrate vs. supplement type. 
 ```{r}
+# go back and remove the na not strictyl needed for this 
+# e prisha mjuabetin 
 scfa_wide %>%
   ggplot(aes(x = supplement_consumed,
              y = delta_butyrate,
@@ -402,6 +455,7 @@ scfa_wide %>%
   group_by(supplement_consumed) %>%
   summarise(sample_size = n())
 ```
+lower n can still be used if its normal, but underpowered 
 
 Divide the labor with your neighbors and run the normality check on each of the 12 supplements. The first few have been completed as an example.
 ```{r}
@@ -425,10 +479,33 @@ shapiro.test(s4$delta_butyrate) #p-value = 0.7113
 s5 <- scfa_wide %>%
   filter(supplement_consumed == "HiMaize+BRMPS") 
 shapiro.test(s5$delta_butyrate) #p-value = 0.6287
-
+# dont forget to change the p values for the 
+#some of theres are coming out the same
+#look back at that in the future for now becasue thats a a bit funky 
 s6 <- scfa_wide %>%
+  filter(supplement_consumed == "BRMPS") 
+shapiro.test(s6$delta_butyrate) #p-value = 0.2537
+
+s7 <- scfa_wide %>%
   filter(supplement_consumed == "Inulin") 
 shapiro.test(s6$delta_butyrate) #p-value = 0.492
+
+s8 <- scfa_wide %>%
+  filter(supplement_consumed == "LOODAT") 
+shapiro.test(s6$delta_butyrate) #p-value = 0.492
+
+s9 <- scfa_wide %>%
+  filter(supplement_consumed == "Psyllium") 
+shapiro.test(s6$delta_butyrate) #p-value = 0.492
+
+s10 <- scfa_wide %>%
+  filter(supplement_consumed == "Psyllium+BRMPS") 
+shapiro.test(s6$delta_butyrate) #p-value = 0.492
+
+s11 <- scfa_wide %>%
+  filter(supplement_consumed == "transition_HiMaize") 
+shapiro.test(s6$delta_butyrate) #p-value = 0.492
+
 ```
 
 ```{r}
